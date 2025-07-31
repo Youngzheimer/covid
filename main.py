@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import os
+import time
 
 # Map Legend:
 # 0: empty space
@@ -48,7 +50,7 @@ class Building:
     def contains_point(self, x, y):
         return (self.x <= x < self.x + self.size) and (self.y <= y < self.y + self.size)
 
-def generate_map(size=100, houses=5, house_size=3, buildings=3, building_size=5, road_width=6):
+def generate_map(size=100, houses=5, house_size=3, buildings=3, building_size=5, road_width=6, roads=1):
     """
     Generate a map with houses, buildings, and roads.
     
@@ -69,11 +71,40 @@ def generate_map(size=100, houses=5, house_size=3, buildings=3, building_size=5,
     # 지도 생성
     map_array = np.zeros((size, size), dtype=int)
 
-    # 도로를 위치 랜덤이지만 적어도 중앙에서 크게 벗어나진 않도록 세로 가로의 도로 생성
-    center = size // 2
-    for i in range(int(center + road_width * 2 * random.uniform(0.8, 1.2) - road_width // 2), int(center + road_width * 2 * random.uniform(0.8, 1.2) + road_width // 2)):
-        map_array[i, :] = 1  # 수직 도로
-        map_array[:, i] = 1  # 수평 도로
+    # Create the specified number of roads at random positions
+    # Minimum distance between roads is 6 cells
+    
+    # Lists to track road positions
+    vertical_positions = []
+    horizontal_positions = []
+    
+    # Generate vertical roads
+    for _ in range(roads):
+        attempts = 0
+        while attempts < 100:  # Limit attempts to avoid infinite loop
+            # Random position for vertical road
+            pos = random.randint(road_width, size - road_width)
+            
+            # Check if it's at least 6 cells away from other roads
+            if all(abs(pos - existing) >= 6 for existing in vertical_positions):
+                vertical_positions.append(pos)
+                map_array[:, pos:pos + road_width] = 1  # Create vertical road
+                break
+            attempts += 1
+    
+    # Generate horizontal roads
+    for _ in range(roads):
+        attempts = 0
+        while attempts < 100:  # Limit attempts to avoid infinite loop
+            # Random position for horizontal road
+            pos = random.randint(road_width, size - road_width)
+            
+            # Check if it's at least 6 cells away from other roads
+            if all(abs(pos - existing) >= 6 for existing in horizontal_positions):
+                horizontal_positions.append(pos)
+                map_array[pos:pos + road_width, :] = 1  # Create horizontal road
+                break
+            attempts += 1
     
     # **도로에 맞닿아 있도록** 집과 건물 배치
     houses_list = []
@@ -222,7 +253,90 @@ def visualize_map(map_array, people_list=None):
     plt.title('COVID-19 Simulation Map')
     plt.show()
 
-def run_simulation(map_array, people_list, houses_list, buildings_list, num_days=100, infection_rate=[0.3, 0.01, 0.001], recovery_rate=[0.1, 0.05, 0.02], death_rate=[0.01, 0.005, 0.02], infected_people_conscience=0.7):
+def save_npy(map_array, people_list, houses_list, buildings_list, npy_save_dir='./'):
+    """
+    Save the simulation state to NPY files.
+    
+    Parameters:
+    - map_array: The map grid
+    - people_list: List of Person objects
+    - houses_list: List of House objects
+    - buildings_list: List of Building objects
+    - npy_save_dir: Directory to save the NPY files
+    """
+    # Ensure the output directory exists
+    if not os.path.exists(npy_save_dir):
+        os.makedirs(npy_save_dir)
+    
+    # Get current timestamp for filename prefix
+    timestamp = str(int(time.time() * 1000))
+    
+    # Save the map array
+    np.save(os.path.join(npy_save_dir, f'{timestamp}_map_array.npy'), map_array)
+    
+    # Convert people_list to a structured array for saving
+    people_data = []
+    for person in people_list:
+        people_data.append({
+            'id': person.id,
+            'x': person.x, 
+            'y': person.y,
+            'house_id': person.house_id,
+            'age_group': person.age_group,
+            'mask_status': person.mask_status,
+            'infection_status': person.infection_status,
+            'dest_type': 0 if person.dest_type is None else (1 if person.dest_type == 'house' else 2),
+            'dest_id': -1 if person.dest_id is None else person.dest_id
+        })
+    
+    # Convert to numpy structured array and save
+    people_dtype = [
+        ('id', int), ('x', int), ('y', int), ('house_id', int), 
+        ('age_group', int), ('mask_status', int), ('infection_status', int),
+        ('dest_type', int), ('dest_id', int)
+    ]
+    # Convert list of dictionaries to list of tuples in the right order
+    people_tuples = [(p['id'], p['x'], p['y'], p['house_id'], p['age_group'], 
+                      p['mask_status'], p['infection_status'], p['dest_type'], p['dest_id']) 
+                     for p in people_data]
+    people_array = np.array(people_tuples, dtype=people_dtype)
+    np.save(os.path.join(npy_save_dir, f'{timestamp}_people.npy'), people_array)
+    
+    # Save houses data
+    houses_data = []
+    for house in houses_list:
+        houses_data.append({
+            'id': house.id,
+            'x': house.x,
+            'y': house.y,
+            'size': house.size
+        })
+    
+    houses_dtype = [('id', int), ('x', int), ('y', int), ('size', int)]
+    # Convert list of dictionaries to list of tuples in the right order
+    houses_tuples = [(h['id'], h['x'], h['y'], h['size']) for h in houses_data]
+    houses_array = np.array(houses_tuples, dtype=houses_dtype)
+    np.save(os.path.join(npy_save_dir, f'{timestamp}_houses.npy'), houses_array)
+    
+    # Save buildings data
+    buildings_data = []
+    for building in buildings_list:
+        buildings_data.append({
+            'id': building.id,
+            'x': building.x,
+            'y': building.y,
+            'size': building.size
+        })
+    
+    buildings_dtype = [('id', int), ('x', int), ('y', int), ('size', int)]
+    # Convert list of dictionaries to list of tuples in the right order
+    buildings_tuples = [(b['id'], b['x'], b['y'], b['size']) for b in buildings_data]
+    buildings_array = np.array(buildings_tuples, dtype=buildings_dtype)
+    np.save(os.path.join(npy_save_dir, f'{timestamp}_buildings.npy'), buildings_array)
+    
+    print(f"Simulation state saved to {npy_save_dir} with timestamp {timestamp}")
+
+def run_simulation(map_array, people_list, houses_list, buildings_list, num_days=100, infection_rate=[0.3, 0.01, 0.001], recovery_rate=[0.1, 0.05, 0.02], death_rate=[0.01, 0.005, 0.02], infected_people_conscience=0.7, npy_save_dir='./'):
     """
     Run a COVID-19 simulation
     
@@ -236,6 +350,10 @@ def run_simulation(map_array, people_list, houses_list, buildings_list, num_days
     - recovery_rate: List of recovery rates for different age groups (child, adult, senior)
     - death_rate: List of death rates for different age groups (child, adult, senior)
     """
+    # Ensure the output directory exists
+    if not os.path.exists(npy_save_dir):
+        os.makedirs(npy_save_dir)
+
     # This is a placeholder for the actual simulation logic
     # You would implement movement, infection spread, etc. here
     print(f"Starting simulation with {len(people_list)} people...")
@@ -271,18 +389,27 @@ def run_simulation(map_array, people_list, houses_list, buildings_list, num_days
 
         # day is started, move move move move
         while True:
+            # Save current state of people for visualization
+            save_npy(map_array, people_list, houses_list, buildings_list, npy_save_dir)
             # Simulate movement of people
             simulate_movement(people_list, map_array, houses_list, buildings_list)
-            # Simulate infection spread
-            visualize_map(map_array, people_list)
+            # Simulate infection spread on roads during movement
+            simulate_infection(people_list, infection_rate, recovery_rate, death_rate)
+            # Visualize after each movement
+            # visualize_map(map_array, people_list)
             
             # Check if all people have reached their destinations
             if all(person.dest_type is None for person in people_list):
                 break
-        
+                
+        save_npy(map_array, people_list, houses_list, buildings_list, npy_save_dir)
+
         print(f"Day {day + 1} everyone has reached their work or school or sum idk.")
 
-        # Simulate infection spread inside houses and buildings
+        # Simulate infection spread inside buildings
+        simulate_infection_inside(people_list, houses_list, buildings_list, 
+                               infection_rate, recovery_rate, death_rate, 
+                               simulation_iterations=3)  # More iterations for workplaces
 
 
         # And go home yeyeyeyeyeyeyeyeyeyeyeyeyey   
@@ -291,17 +418,47 @@ def run_simulation(map_array, people_list, houses_list, buildings_list, num_days
             person.dest_id = person.house_id  # Go back to their house
 
         while True:
+            # Save current state of people for visualization
+            save_npy(map_array, people_list, houses_list, buildings_list, npy_save_dir)
             # Simulate movement of people
             simulate_movement(people_list, map_array, houses_list, buildings_list)
-            # Simulate infection spread
-            visualize_map(map_array, people_list)
+            # Simulate infection spread on roads during movement
+            simulate_infection(people_list, infection_rate, recovery_rate, death_rate)
+            # Visualize after each movement
+            # visualize_map(map_array, people_list)
 
             # Check if all people have reached their destinations
             if all(person.dest_type is None for person in people_list):
                 break
+        # visualize_map(map_array, people_list)
+
+        save_npy(map_array, people_list, houses_list, buildings_list, npy_save_dir)
         
+        # Simulate infection spread inside houses
+        simulate_infection_inside(people_list, houses_list, buildings_list, 
+                               infection_rate, recovery_rate, death_rate, 
+                               simulation_iterations=5)  # More iterations for home as people spend more time there
+        # Simulate death based on infection status
+        for person in people_list:
+            if person.infection_status == 1:
+                # Simulate death based on death rate
+                if random.random() < death_rate[person.age_group]:
+                    person.infection_status = 3
+
+        save_npy(map_array, people_list, houses_list, buildings_list, npy_save_dir)
+
         print(f"Day {day + 1} everyone has reached their home.")
         print(f"Day {day + 1} simulation step completed.")
+
+        print(f"Day {day + 1} statistics:")
+        # Report statistics
+        infected_count = sum(1 for person in people_list if person.infection_status == 1)
+        recovered_count = sum(1 for person in people_list if person.infection_status == 2)
+        dead_count = sum(1 for person in people_list if person.infection_status == 3)
+        print(f"Infected: {infected_count}")
+        print(f"Recovered: {recovered_count}")
+        print(f"Dead: {dead_count}")
+        print(f"Day {day + 1} everyone has reached their home.")
 
     # Visualize final state
     visualize_map(map_array, people_list)
@@ -414,6 +571,27 @@ def find_nearest_road(map_array, target_x, target_y):
     
     # No road found
     return None
+
+def norm_cdf(x):
+    """
+    Approximation of the cumulative distribution function for the standard normal distribution.
+    """
+    # Constants for approximation
+    b1 = 0.319381530
+    b2 = -0.356563782
+    b3 = 1.781477937
+    b4 = -1.821255978
+    b5 = 1.330274429
+    p = 0.2316419
+    c = 0.39894228
+    
+    # Ensure x is positive
+    if x >= 0:
+        t = 1.0 / (1.0 + p * x)
+        return 1.0 - c * np.exp(-x * x / 2.0) * (((((b5 * t + b4) * t + b3) * t + b2) * t + b1) * t)
+    else:
+        # Use symmetry property
+        return 1.0 - norm_cdf(-x)
 
 def simulate_movement(people_list, map_array, houses_list, buildings_list):
     """
@@ -563,25 +741,192 @@ def simulate_movement(people_list, map_array, houses_list, buildings_list):
             next_x, next_y = path[1]
             person.x, person.y = next_x, next_y
 
+def simulate_infection(people_list, infection_rate, recovery_rate, death_rate):
+    """
+    Simulate infection spread among people on the roads.
+    
+    Parameters:
+    - people_list: List of Person objects
+    - infection_rate: Infection rate for different mask statuses
+    - recovery_rate: Recovery rate for different age groups
+    - death_rate: Death rate for different age groups
+    """
+    # Find all infected people (infection_status == 1)
+    infected_people = [person for person in people_list if person.infection_status == 1]
+    
+    # For each infected person, check for potential transmission to others
+    for infected in infected_people:
+        # Skip dead people
+        if infected.infection_status == 3:
+            continue
+            
+        # Get infected person's mask status to determine base transmission rate
+        base_rate = infection_rate[infected.mask_status]
+        
+        # Check all other people for potential infection
+        for person in people_list:
+            # Skip if the person is already infected, recovered, dead, or is the infector
+            if (person.id == infected.id or 
+                person.infection_status != 0):  # Not normal health status
+                continue
+                
+            # Calculate distance between infected and potential victim
+            dx = infected.x - person.x
+            dy = infected.y - person.y
+            distance = (dx ** 2 + dy ** 2) ** 0.5  # Euclidean distance
+            
+            # If they're too far apart, no infection chance
+            if distance > 5:  # Arbitrary cutoff distance for efficiency
+                continue
+                
+            # Calculate infection probability based on distance
+            if distance == 0:  # Same position
+                distance_factor = 1.5
+            elif distance == 1:  # Adjacent (orthogonal)
+                distance_factor = 1.0
+            else:
+                # For distance > 1, use normal distribution to decay probability
+                # n-1 on standard normal distribution table, multiply by 2 to get a steeper falloff
+                std_normal_value = norm_cdf(distance - 1)
+                distance_factor = 1 - (1 - std_normal_value) * 2
+                
+                # Ignore very small probabilities for efficiency
+                if distance_factor < 0.01:
+                    continue
+            
+            # Final infection probability
+            infection_probability = base_rate * distance_factor
+            
+            # Determine if infection occurs
+            if random.random() < infection_probability:
+                person.infection_status = 1  # Set to infected
+
+
+def simulate_infection_inside(people_list, houses_list, buildings_list, infection_rate, recovery_rate, death_rate, simulation_iterations=1):
+    """
+    Simulate infection spread inside houses and buildings.
+    
+    Parameters:
+    - people_list: List of Person objects
+    - houses_list: List of House objects
+    - buildings_list: List of Building objects
+    - infection_rate: Infection rate for different mask statuses
+    - recovery_rate: Recovery rate for different age groups
+    - death_rate: Death rate for different age groups
+    - simulation_iterations: Number of infection simulation iterations within buildings
+    """
+    # Group people by their current location (house or building)
+    people_by_house = {}
+    people_by_building = {}
+    
+    for person in people_list:
+        # Skip dead people
+        if person.infection_status == 3:
+            continue
+            
+        # Check if person is in a house
+        for house in houses_list:
+            if house.contains_point(person.x, person.y):
+                if house.id not in people_by_house:
+                    people_by_house[house.id] = []
+                people_by_house[house.id].append(person)
+                break
+        
+        # Check if person is in a building
+        for building in buildings_list:
+            if building.contains_point(person.x, person.y):
+                if building.id not in people_by_building:
+                    people_by_building[building.id] = []
+                people_by_building[building.id].append(person)
+                break
+    
+    # For each building, run multiple infection simulation iterations
+    for _ in range(simulation_iterations):
+        # Process infections in houses
+        for house_id, occupants in people_by_house.items():
+            # Find infected occupants
+            infected_occupants = [p for p in occupants if p.infection_status == 1]
+            
+            # If there are infected people in the house
+            for infected in infected_occupants:
+                # Get base infection rate based on infected person's mask status
+                base_rate = infection_rate[infected.mask_status]
+                
+                # Increased transmission rate for indoor environments
+                indoor_factor = 2.0  # Transmission is higher indoors
+                
+                # Check for transmission to each other occupant
+                for person in occupants:
+                    # Skip if the person is already infected, recovered, dead, or is the infector
+                    if (person.id == infected.id or 
+                        person.infection_status != 0):
+                        continue
+                    
+                    # Higher chance of infection indoors
+                    infection_probability = base_rate * indoor_factor
+                    
+                    # Determine if infection occurs
+                    if random.random() < infection_probability:
+                        person.infection_status = 1  # Set to infected
+        
+        # Process infections in buildings (same logic as houses, but separate loop)
+        for building_id, occupants in people_by_building.items():
+            # Find infected occupants
+            infected_occupants = [p for p in occupants if p.infection_status == 1]
+            
+            # If there are infected people in the building
+            for infected in infected_occupants:
+                # Get base infection rate based on infected person's mask status
+                base_rate = infection_rate[infected.mask_status]
+                
+                # Increased transmission rate for indoor environments
+                indoor_factor = 1.5  # Transmission is higher indoors, but less than houses due to potentially larger space
+                
+                # Check for transmission to each other occupant
+                for person in occupants:
+                    # Skip if the person is already infected, recovered, dead, or is the infector
+                    if (person.id == infected.id or 
+                        person.infection_status != 0):
+                        continue
+                    
+                    # Higher chance of infection indoors
+                    infection_probability = base_rate * indoor_factor
+                    
+                    # Determine if infection occurs
+                    if random.random() < infection_probability:
+                        person.infection_status = 1  # Set to infected
+    
+    # Process recovery and death after infection spread is simulated
+    for person in people_list:
+        # Skip non-infected people
+        if person.infection_status != 1:
+            continue
+            
+        # Check for recovery based on age group
+        if random.random() < recovery_rate[person.age_group]:
+            person.infection_status = 2  # Recovered
+
         
 if __name__ == "__main__":
     # Example usage
     map_size = 100
     map_array, houses_list, buildings_list = generate_map(
         size=map_size, 
-        houses=10, 
+        houses=20, 
         house_size=3, 
         buildings=5, 
-        building_size=5
+        building_size=5,
+        roads=2,
     )
     
     # Generate people and place them in houses
     people_list = generate_people(
         map_array, 
         houses_list, 
-        person_min_per_house=1, 
-        person_max_per_house=1, 
-        infection_rate=0.1
+        person_min_per_house=5, 
+        person_max_per_house=8, 
+        infection_rate=0.05,
+        mask_distribution=[0.5, 0.4, 0.1],  # 50% no mask, 40% cloth mask, 10% mask+face shield
     )
     
     print(f"Map size: {map_size}x{map_size}")
@@ -596,6 +941,8 @@ if __name__ == "__main__":
     print("\nSample of people:")
     for i in range(min(5, len(people_list))):
         print(people_list[i])
+    
+    save_dir = f'./simulation_data_{int(time.time())}/'
         
     # Uncomment to run a full simulation
-    run_simulation(map_array, people_list, houses_list, buildings_list)
+    run_simulation(map_array, people_list, houses_list, buildings_list, infection_rate=[0.003, 0.00001, 0.000001], death_rate=[0.01, 0.005, 0.3], num_days=20, npy_save_dir=save_dir)
