@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import random
 import os
 import time
+from mpi4py import MPI
+from timing_results import TimingManager
 
 # Map Legend:
 # 0: empty space
@@ -216,42 +218,42 @@ def visualize_map(map_array, people_list=None):
     - people_list: Optional list of Person objects to visualize
     """
     # Create a copy of the map to visualize (so we don't modify the original)
-    viz_map = map_array.copy()
+    # viz_map = map_array.copy()
     
     # 보기 편하도록 숫자 변경
     # house -> 2
     # building -> 3
     # road -> 1
     # empty space -> 0
-    viz_map[(viz_map >= 200) & (viz_map <= 299)] = 2  # 집
-    viz_map[(viz_map >= 300) & (viz_map <= 399)] = 3  # 건물
+    # viz_map[(viz_map >= 200) & (viz_map <= 299)] = 2  # 집
+    # viz_map[(viz_map >= 300) & (viz_map <= 399)] = 3  # 건물
     
     # Add people to the visualization if provided
-    if people_list:
-        for person in people_list:
+    # if people_list:
+    #     for person in people_list:
             # Different colors for different infection statuses
             # 5: healthy, 6: infected, 7: recovered, 8: dead
-            viz_map[person.x, person.y] = 5 + person.infection_status
+            # viz_map[person.x, person.y] = 5 + person.infection_status
     
-    plt.figure(figsize=(10, 10))
+    # plt.figure(figsize=(10, 10))
     
     # Create a custom colormap for better visualization
-    import matplotlib.colors as mcolors
-    colors = ['white', 'gray', 'green', 'blue', 'black', 'yellow', 'red', 'purple', 'black']
-    cmap = mcolors.ListedColormap(colors)
+    # import matplotlib.colors as mcolors
+    # colors = ['white', 'gray', 'green', 'blue', 'black', 'yellow', 'red', 'purple', 'black']
+    # cmap = mcolors.ListedColormap(colors)
     
     # Set bounds for colorbar
-    bounds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    norm = mcolors.BoundaryNorm(bounds, cmap.N)
+    # bounds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    # norm = mcolors.BoundaryNorm(bounds, cmap.N)
     
-    plt.imshow(viz_map, cmap=cmap, norm=norm, interpolation='nearest')
+    # plt.imshow(viz_map, cmap=cmap, norm=norm, interpolation='nearest')
     
     # Create custom colorbar
-    cbar = plt.colorbar(ticks=[0.5, 1.5, 2.5, 3.5, 5.5, 6.5, 7.5, 8.5])
-    cbar.ax.set_yticklabels(['Empty', 'Road', 'House', 'Building', 'Healthy', 'Infected', 'Recovered', 'Dead'])
+    # cbar = plt.colorbar(ticks=[0.5, 1.5, 2.5, 3.5, 5.5, 6.5, 7.5, 8.5])
+    # cbar.ax.set_yticklabels(['Empty', 'Road', 'House', 'Building', 'Healthy', 'Infected', 'Recovered', 'Dead'])
     
-    plt.title('COVID-19 Simulation Map')
-    plt.show()
+    # plt.title('COVID-19 Simulation Map')
+    # plt.show()
 
 def save_npy(map_array, people_list, houses_list, buildings_list, npy_save_dir='./'):
     """
@@ -336,7 +338,7 @@ def save_npy(map_array, people_list, houses_list, buildings_list, npy_save_dir='
     
     print(f"Simulation state saved to {npy_save_dir} with timestamp {timestamp}")
 
-def run_simulation(map_array, people_list, houses_list, buildings_list, num_days=100, infection_rate=[0.3, 0.01, 0.001], recovery_rate=[0.1, 0.05, 0.02], death_rate=[0.01, 0.005, 0.02], infected_people_conscience=0.7, npy_save_dir='./'):
+def run_simulation(map_array, people_list, houses_list, buildings_list, num_days=100, infection_rate=[0.3, 0.01, 0.001], recovery_rate=[0.1, 0.05, 0.02], death_rate=[0.01, 0.005, 0.02], infected_people_conscience=0.7, npy_save_dir='./', timing_output_file=None):
     """
     Run a COVID-19 simulation
     
@@ -349,7 +351,12 @@ def run_simulation(map_array, people_list, houses_list, buildings_list, num_days
     - infection_rate: List of infection rates for different mask statuses (no_mask, cloth_mask, mask+face_shield)
     - recovery_rate: List of recovery rates for different age groups (child, adult, senior)
     - death_rate: List of death rates for different age groups (child, adult, senior)
+    - timing_output_file: File to save timing results
     """
+    # Initialize timing manager
+    timing = TimingManager(output_file=timing_output_file, rank=0)
+    timing.start_timing("total_simulation")
+    
     # Ensure the output directory exists
     if not os.path.exists(npy_save_dir):
         os.makedirs(npy_save_dir)
@@ -367,6 +374,8 @@ def run_simulation(map_array, people_list, houses_list, buildings_list, num_days
     
     # Placeholder for simulation steps
     for day in range(num_days):
+        timing.start_timing(f"day_{day}")
+        print(f"[TIMING] Starting day {day}")
         # Simulate each day
         # First step, update people going to their destinations
         for person in people_list:
@@ -402,14 +411,20 @@ def run_simulation(map_array, people_list, houses_list, buildings_list, num_days
             if all(person.dest_type is None for person in people_list):
                 break
                 
+        timing.start_timing(f"day_{day}_data_saving")
         save_npy(map_array, people_list, houses_list, buildings_list, npy_save_dir)
+        elapsed_save = timing.end_timing(f"day_{day}_data_saving")
+        print(f"[TIMING] Data saving: {elapsed_save:.4f} seconds")
 
         print(f"Day {day + 1} everyone has reached their work or school or sum idk.")
 
         # Simulate infection spread inside buildings
+        timing.start_timing(f"day_{day}_infection_inside_buildings")
         simulate_infection_inside(people_list, houses_list, buildings_list, 
                                infection_rate, recovery_rate, death_rate, 
                                simulation_iterations=3)  # More iterations for workplaces
+        elapsed_infection = timing.end_timing(f"day_{day}_infection_inside_buildings")
+        print(f"[TIMING] Infection simulation in buildings: {elapsed_infection:.4f} seconds")
 
 
         # And go home yeyeyeyeyeyeyeyeyeyeyeyeyey   
@@ -435,9 +450,12 @@ def run_simulation(map_array, people_list, houses_list, buildings_list, num_days
         save_npy(map_array, people_list, houses_list, buildings_list, npy_save_dir)
         
         # Simulate infection spread inside houses
+        timing.start_timing(f"day_{day}_infection_inside_houses")
         simulate_infection_inside(people_list, houses_list, buildings_list, 
                                infection_rate, recovery_rate, death_rate, 
                                simulation_iterations=5)  # More iterations for home as people spend more time there
+        elapsed_infection = timing.end_timing(f"day_{day}_infection_inside_houses")
+        print(f"[TIMING] Infection simulation in houses: {elapsed_infection:.4f} seconds")
         # Simulate death based on infection status
         for person in people_list:
             if person.infection_status == 1:
@@ -459,6 +477,10 @@ def run_simulation(map_array, people_list, houses_list, buildings_list, num_days
         print(f"Recovered: {recovered_count}")
         print(f"Dead: {dead_count}")
         print(f"Day {day + 1} everyone has reached their home.")
+        
+        # End timing for this day
+        elapsed_day = timing.end_timing(f"day_{day}")
+        print(f"[TIMING] Day {day} completed in: {elapsed_day:.4f} seconds")
 
     # Visualize final state
     visualize_map(map_array, people_list)
@@ -472,6 +494,15 @@ def run_simulation(map_array, people_list, houses_list, buildings_list, num_days
     print(f"Infected: {infected_count}")
     print(f"Recovered: {recovered_count}")
     print(f"Dead: {dead_count}")
+    
+    # End total timing and print summary
+    elapsed_total = timing.end_timing("total_simulation")
+    print(f"[TIMING] Total sequential simulation time: {elapsed_total:.4f} seconds")
+    timing.print_all_timings()
+    
+    # Save timing results to file
+    if timing_output_file:
+        timing.save_timings()
 
 def find_path(map_array, start_x, start_y, target_x, target_y):
     """
@@ -907,32 +938,588 @@ def simulate_infection_inside(people_list, houses_list, buildings_list, infectio
             person.infection_status = 2  # Recovered
 
         
+def split_people_by_regions(people_list, map_size, num_processes):
+    """
+    Split people into regions for parallel processing.
+    
+    Parameters:
+    - people_list: List of Person objects
+    - map_size: Size of the map (assuming it's square)
+    - num_processes: Number of MPI processes
+    
+    Returns:
+    - local_people: List of people in this process's region
+    """
+    # MPI rank and size
+    comm = MPI.COMM_WORLD 
+    rank = comm.Get_rank()
+    
+    # Calculate region boundaries for each process (divide map into rows)
+    region_height = map_size // num_processes
+    start_row = rank * region_height
+    end_row = (rank + 1) * region_height if rank < num_processes - 1 else map_size
+    
+    # Filter people in this process's region
+    local_people = [person for person in people_list if start_row <= person.x < end_row]
+    
+    print(f"[DEBUG][Rank {rank}] Region: rows {start_row}-{end_row}, Got {len(local_people)} people out of {len(people_list)}")
+    
+    return local_people, start_row, end_row
+
+def exchange_boundary_data(local_people, start_row, end_row, map_size):
+    """
+    Exchange people who moved across process boundaries.
+    
+    Parameters:
+    - local_people: List of Person objects in this process's region
+    - start_row: Starting row of this process's region
+    - end_row: Ending row of this process's region
+    - map_size: Size of the map
+    
+    Returns:
+    - Updated local_people list after boundary exchange
+    """
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+    
+    # People moving out of this process's region
+    outgoing_people = [p for p in local_people if p.x < start_row or p.x >= end_row]
+    
+    # People staying in this process's region
+    staying_people = [p for p in local_people if start_row <= p.x < end_row]
+    
+    print(f"[DEBUG][Rank {rank}] Exchange: {len(outgoing_people)} people leaving, {len(staying_people)} staying")
+    
+    # 더 안전한 점대점 통신 방식으로 변경
+    updated_local_people = staying_people[:]  # 복사본 생성
+    
+    # 각 프로세스별로 필요한 사람들을 직접 교환
+    for target_rank in range(size):
+        # 현재 프로세스에서 target_rank로 보낼 사람들 필터링
+        region_start = target_rank * (map_size // size)
+        region_end = (target_rank + 1) * (map_size // size) if target_rank < size - 1 else map_size
+        send_people = [p for p in outgoing_people if region_start <= p.x < region_end]
+        
+        # 디버그 정보
+        if send_people:
+            print(f"[DEBUG][Rank {rank}] Sending {len(send_people)} people to rank {target_rank}")
+            for person in send_people:
+                print(f"[DEBUG][Rank {rank}] Person {person.id} at ({person.x},{person.y}) moving to rank {target_rank}")
+        
+        # 통신 객체 생성: 리스트 타입
+        send_obj = send_people
+        
+        try:
+            # 동기화 지점을 하나씩 처리: 한 번에 한 쌍의 프로세스만 통신
+            # (내 프로세스, 타겟 프로세스) 쌍
+            if rank == target_rank:
+                # 자기 자신과는 교환할 필요 없음
+                recv_obj = []
+            else:
+                print(f"[DEBUG][Rank {rank}] Exchanging data with rank {target_rank}")
+                # 교착상태를 방지하기 위한 알고리즘 개선
+                # 낮은 랭크에서 높은 랭크로는 먼저 보내고 받기, 높은 랭크에서 낮은 랭크로는 먼저 받고 보내기
+                if rank < target_rank:
+                    # 낮은 랭크: 먼저 보내고 나중에 받음
+                    comm.send(send_obj, dest=target_rank, tag=10*rank+target_rank)
+                    recv_obj = comm.recv(source=target_rank, tag=10*target_rank+rank)
+                else:
+                    # 높은 랭크: 먼저 받고 나중에 보냄
+                    recv_obj = comm.recv(source=target_rank, tag=10*target_rank+rank)
+                    comm.send(send_obj, dest=target_rank, tag=10*rank+target_rank)
+                
+                print(f"[DEBUG][Rank {rank}] Received {len(recv_obj)} people from rank {target_rank}")
+                
+            # 받은 사람들을 로컬 리스트에 추가
+            updated_local_people.extend(recv_obj)
+            
+        except Exception as e:
+            print(f"[ERROR][Rank {rank}] Exception during exchange with rank {target_rank}: {str(e)}")
+    
+    # 동기화를 위한 배리어 추가
+    try:
+        comm.Barrier()
+        print(f"[DEBUG][Rank {rank}] Exchange completed: now has {len(updated_local_people)} people")
+        return updated_local_people
+    except Exception as e:
+        print(f"[ERROR][Rank {rank}] Exception during barrier after exchange: {str(e)}")
+        return staying_people
+
+def gather_all_people(local_people):
+    """
+    Gather all people from all processes.
+    
+    Parameters:
+    - local_people: List of Person objects in this process's region
+    
+    Returns:
+    - all_people: Combined list of all people from all processes (only on rank 0)
+    """
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+    
+    print(f"[DEBUG][Rank {rank}] Starting gather with {len(local_people)} local people")
+    
+    # gather 대신 점대점 통신을 사용하여 rank 0에 모든 데이터 수집
+    try:
+        if rank == 0:
+            # rank 0은 모든 다른 프로세스로부터 데이터를 수집
+            all_people = [local_people[:]]  # 자신의 데이터로 초기화
+            
+            # 다른 모든 프로세스에서 데이터 수집
+            for source_rank in range(1, size):
+                print(f"[DEBUG][Rank 0] Waiting to receive data from rank {source_rank}")
+                people_from_rank = comm.recv(source=source_rank, tag=source_rank)
+                print(f"[DEBUG][Rank 0] Received {len(people_from_rank)} people from rank {source_rank}")
+                all_people.append(people_from_rank)
+            
+            # 결과 병합
+            flattened = [person for sublist in all_people for person in sublist]
+            print(f"[DEBUG][Rank 0] Gather complete: collected {len(flattened)} people total")
+            return flattened
+        else:
+            # 다른 프로세스는 rank 0으로 데이터를 전송
+            print(f"[DEBUG][Rank {rank}] Sending {len(local_people)} people to rank 0")
+            comm.send(local_people, dest=0, tag=rank)
+            print(f"[DEBUG][Rank {rank}] Data sent to rank 0")
+            return None
+            
+    except Exception as e:
+        print(f"[ERROR][Rank {rank}] Exception during gather: {str(e)}")
+        if rank == 0:
+            print("[WARNING][Rank 0] Returning local people only due to gather failure")
+            return local_people
+        return None
+
+def run_simulation_parallel(map_array, people_list, houses_list, buildings_list, num_days=100, 
+                           infection_rate=[0.3, 0.01, 0.001], recovery_rate=[0.1, 0.05, 0.02], 
+                           death_rate=[0.01, 0.005, 0.02], infected_people_conscience=0.7, 
+                           npy_save_dir='./', timing_output_file=None):
+    """
+    Run a COVID-19 simulation in parallel using MPI
+    """
+    # MPI initialization
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+    
+    # Initialize timing manager
+    timing = TimingManager(output_file=timing_output_file, rank=rank)
+    timing.start_timing("total_simulation")
+    
+    print(f"[DEBUG][Rank {rank}] Starting parallel simulation, rank {rank} of {size}")
+    
+    # Map dimensions
+    map_size = map_array.shape[0]
+    
+    # Ensure the output directory exists (only on rank 0)
+    if rank == 0:
+        if not os.path.exists(npy_save_dir):
+            os.makedirs(npy_save_dir)
+        print(f"Starting parallel simulation with {len(people_list)} people on {size} processes...")
+        
+        # Count initial infections
+        infected_count = sum(1 for person in people_list if person.infection_status == 1)
+        print(f"Initial infected count: {infected_count}")
+    
+    # Split people by regions for initial distribution
+    print(f"[DEBUG][Rank {rank}] Splitting people by regions")
+    try:
+        timing.start_timing("split_people_by_regions")
+        local_people, start_row, end_row = split_people_by_regions(people_list, map_size, size)
+        elapsed = timing.end_timing("split_people_by_regions")
+        print(f"[TIMING][Rank {rank}] Split people by regions: {elapsed:.4f} seconds")
+    except Exception as e:
+        print(f"[ERROR][Rank {rank}] Error during splitting: {str(e)}")
+        return
+    
+    # Synchronize to ensure all processes have their people assigned
+    print(f"[DEBUG][Rank {rank}] Waiting at barrier before simulation loop")
+    try:
+        comm.Barrier()
+        print(f"[DEBUG][Rank {rank}] Barrier passed, starting simulation loop")
+    except Exception as e:
+        print(f"[ERROR][Rank {rank}] Error at barrier: {str(e)}")
+        return
+    
+    for day in range(num_days):
+        timing.start_timing(f"day_{day}")
+        print(f"[TIMING][Rank {rank}] Starting day {day}")
+        
+        # First step, update people going to their destinations
+        timing.start_timing(f"day_{day}_destination_assignment")
+        for person in local_people:
+            person.dest_type = None  # Reset destination
+            person.dest_id = None
+            
+            # Skip dead people
+            if person.infection_status == 3:  # Dead status
+                continue
+                
+            # If infected, they might stay home based on conscience
+            if person.infection_status == 1 and random.random() < infected_people_conscience:
+                # Infected people might not go to work
+                continue
+                
+            # All other people will go to work
+            person.dest_type = 'building'
+            person.dest_id = random.choice(buildings_list).id
+
+        elapsed = timing.end_timing(f"day_{day}_destination_assignment")
+        print(f"[TIMING][Rank {rank}][Day {day}] Destination assignment: {elapsed:.4f} seconds")
+
+        # Day is started, move people
+        print(f"[DEBUG][Rank {rank}][Day {day}] Starting movement cycle")
+        moving = True
+        while moving:
+            # Simulate movement of people
+            print(f"[DEBUG][Rank {rank}][Day {day}] Simulating movement for {len(local_people)} people")
+            try:
+                timing.start_timing(f"day_{day}_movement")
+                simulate_movement(local_people, map_array, houses_list, buildings_list)
+                elapsed = timing.end_timing(f"day_{day}_movement")
+                print(f"[TIMING][Rank {rank}][Day {day}] Movement simulation: {elapsed:.4f} seconds")
+                print(f"[DEBUG][Rank {rank}][Day {day}] Movement simulation complete")
+            except Exception as e:
+                print(f"[ERROR][Rank {rank}][Day {day}] Error during movement simulation: {str(e)}")
+            
+            # Exchange people who crossed boundaries
+            print(f"[DEBUG][Rank {rank}][Day {day}] Starting boundary exchange")
+            try:
+                timing.start_timing(f"day_{day}_boundary_exchange")
+                local_people = exchange_boundary_data(local_people, start_row, end_row, map_size)
+                elapsed = timing.end_timing(f"day_{day}_boundary_exchange")
+                print(f"[TIMING][Rank {rank}][Day {day}] Boundary exchange: {elapsed:.4f} seconds")
+                print(f"[DEBUG][Rank {rank}][Day {day}] Boundary exchange complete")
+            except Exception as e:
+                print(f"[ERROR][Rank {rank}][Day {day}] Error during boundary exchange: {str(e)}")
+            
+            # Simulate infection spread on roads during movement
+            print(f"[DEBUG][Rank {rank}][Day {day}] Simulating infections")
+            try:
+                timing.start_timing(f"day_{day}_infection")
+                simulate_infection(local_people, infection_rate, recovery_rate, death_rate)
+                elapsed = timing.end_timing(f"day_{day}_infection")
+                print(f"[TIMING][Rank {rank}][Day {day}] Infection simulation: {elapsed:.4f} seconds")
+                print(f"[DEBUG][Rank {rank}][Day {day}] Infection simulation complete")
+            except Exception as e:
+                print(f"[ERROR][Rank {rank}][Day {day}] Error during infection simulation: {str(e)}")
+            
+            # Check if all people have reached their destinations
+            print(f"[DEBUG][Rank {rank}][Day {day}] Checking if all people have arrived")
+            local_all_arrived = all(person.dest_type is None for person in local_people)
+            print(f"[DEBUG][Rank {rank}][Day {day}] Local arrival status: {local_all_arrived}")
+            
+            # Check if all processes have all their people arrived
+            # allreduce 대신 점대점 통신을 사용하여 모든 도착 상태 확인
+            print(f"[DEBUG][Rank {rank}][Day {day}] Checking global arrival status using point-to-point")
+            timing.start_timing(f"day_{day}_communication")
+            try:
+                if rank == 0:
+                    # 랭크 0은 모든 프로세스로부터 도착 상태를 수집
+                    all_statuses = [local_all_arrived]  # 자신의 상태로 초기화
+                    
+                    # 다른 모든 프로세스에서 상태 수집
+                    for source_rank in range(1, size):
+                        print(f"[DEBUG][Rank 0][Day {day}] Waiting for arrival status from rank {source_rank}")
+                        status_from_rank = comm.recv(source=source_rank, tag=500+source_rank)
+                        print(f"[DEBUG][Rank 0][Day {day}] Received arrival status {status_from_rank} from rank {source_rank}")
+                        all_statuses.append(status_from_rank)
+                    
+                    # 모든 프로세스가 완료되었는지 확인
+                    all_arrived = all(all_statuses)
+                    print(f"[DEBUG][Rank 0][Day {day}] Global arrival status: {all_arrived}")
+                    
+                    # 결과를 모든 프로세스에게 브로드캐스트 (점대점으로)
+                    for dest_rank in range(1, size):
+                        comm.send(all_arrived, dest=dest_rank, tag=600+dest_rank)
+                else:
+                    # 다른 프로세스는 자신의 상태를 랭크 0에게 전송
+                    print(f"[DEBUG][Rank {rank}][Day {day}] Sending arrival status {local_all_arrived} to rank 0")
+                    comm.send(local_all_arrived, dest=0, tag=500+rank)
+                    
+                    # 랭크 0으로부터 전체 상태 수신
+                    all_arrived = comm.recv(source=0, tag=600+rank)
+                    print(f"[DEBUG][Rank {rank}][Day {day}] Global arrival status received from rank 0: {all_arrived}")
+                
+                elapsed = timing.end_timing(f"day_{day}_communication")
+                print(f"[TIMING][Rank {rank}][Day {day}] Communication: {elapsed:.4f} seconds")
+            except Exception as e:
+                print(f"[ERROR][Rank {rank}][Day {day}] Error during arrival status check: {str(e)}")
+                timing.end_timing(f"day_{day}_communication")  # Still end timing even if there was an error
+                all_arrived = False  # 에러 발생시 계속 이동
+            
+            # Gather all people to rank 0 for saving state (could be optimized to reduce communication)
+            if rank == 0:
+                print(f"[DEBUG][Rank {rank}][Day {day}] Gathering people data for saving")
+                try:
+                    timing.start_timing(f"day_{day}_data_gathering")
+                    all_people = gather_all_people(local_people)
+                    elapsed_gather = timing.end_timing(f"day_{day}_data_gathering")
+                    print(f"[TIMING][Rank {rank}][Day {day}] Data gathering: {elapsed_gather:.4f} seconds")
+                    
+                    timing.start_timing(f"day_{day}_data_saving")
+                    save_npy(map_array, all_people, houses_list, buildings_list, npy_save_dir)
+                    elapsed_save = timing.end_timing(f"day_{day}_data_saving")
+                    print(f"[TIMING][Rank {rank}][Day {day}] Data saving: {elapsed_save:.4f} seconds")
+                    
+                    print(f"[DEBUG][Rank {rank}][Day {day}] Save complete")
+                except Exception as e:
+                    print(f"[ERROR][Rank {rank}][Day {day}] Error during gather or save: {str(e)}")
+            
+            # Exit loop if all people have reached destinations
+            if all_arrived:
+                print(f"[DEBUG][Rank {rank}][Day {day}] All people have reached destinations")
+                moving = False
+        
+        if rank == 0:
+            print(f"Day {day + 1} everyone has reached their work or school.")
+
+        # Simulate infection spread inside buildings
+        simulate_infection_inside(local_people, houses_list, buildings_list, 
+                               infection_rate, recovery_rate, death_rate, 
+                               simulation_iterations=3)
+
+        # All people go home
+        for person in local_people:
+            person.dest_type = 'house'
+            person.dest_id = person.house_id  # Go back to their house
+
+        # People moving home
+        moving = True
+        while moving:
+            # Simulate movement of people
+            simulate_movement(local_people, map_array, houses_list, buildings_list)
+            
+            # Exchange people who crossed boundaries
+            local_people = exchange_boundary_data(local_people, start_row, end_row, map_size)
+            
+            # Simulate infection spread on roads during movement
+            simulate_infection(local_people, infection_rate, recovery_rate, death_rate)
+            
+            # Check if all people have reached their destinations
+            local_all_arrived = all(person.dest_type is None for person in local_people)
+            print(f"[DEBUG][Rank {rank}][Day {day}] Local arrival status (home): {local_all_arrived}")
+            
+            # 점대점 통신으로 모든 프로세스의 도착 상태 확인
+            try:
+                if rank == 0:
+                    # 랭크 0은 모든 프로세스로부터 도착 상태를 수집
+                    all_statuses = [local_all_arrived]  # 자신의 상태로 초기화
+                    
+                    # 다른 모든 프로세스에서 상태 수집
+                    for source_rank in range(1, size):
+                        print(f"[DEBUG][Rank 0][Day {day}] Waiting for home arrival status from rank {source_rank}")
+                        status_from_rank = comm.recv(source=source_rank, tag=700+source_rank)
+                        print(f"[DEBUG][Rank 0][Day {day}] Received home arrival status {status_from_rank} from rank {source_rank}")
+                        all_statuses.append(status_from_rank)
+                    
+                    # 모든 프로세스가 완료되었는지 확인
+                    all_arrived = all(all_statuses)
+                    print(f"[DEBUG][Rank 0][Day {day}] Global home arrival status: {all_arrived}")
+                    
+                    # 결과를 모든 프로세스에게 브로드캐스트 (점대점으로)
+                    for dest_rank in range(1, size):
+                        comm.send(all_arrived, dest=dest_rank, tag=800+dest_rank)
+                else:
+                    # 다른 프로세스는 자신의 상태를 랭크 0에게 전송
+                    print(f"[DEBUG][Rank {rank}][Day {day}] Sending home arrival status {local_all_arrived} to rank 0")
+                    comm.send(local_all_arrived, dest=0, tag=700+rank)
+                    
+                    # 랭크 0으로부터 전체 상태 수신
+                    all_arrived = comm.recv(source=0, tag=800+rank)
+                    print(f"[DEBUG][Rank {rank}][Day {day}] Global home arrival status received from rank 0: {all_arrived}")
+            except Exception as e:
+                print(f"[ERROR][Rank {rank}][Day {day}] Error during home arrival status check: {str(e)}")
+                all_arrived = False
+            
+            # Gather all people to rank 0 for saving state
+            if rank == 0:
+                print(f"[DEBUG][Rank 0][Day {day}] Gathering people for home status save")
+                all_people = gather_all_people(local_people)
+                save_npy(map_array, all_people, houses_list, buildings_list, npy_save_dir)
+            
+            # Exit loop if all people have reached destinations
+            if all_arrived:
+                print(f"[DEBUG][Rank {rank}][Day {day}] All people have returned home")
+                moving = False
+        
+        # Simulate infection spread inside houses
+        simulate_infection_inside(local_people, houses_list, buildings_list, 
+                               infection_rate, recovery_rate, death_rate, 
+                               simulation_iterations=5)
+                               
+        # Simulate death based on infection status
+        for person in local_people:
+            if person.infection_status == 1:
+                # Simulate death based on death rate
+                if random.random() < death_rate[person.age_group]:
+                    person.infection_status = 3
+        
+        # 통계 수집을 위한 로컬 카운트 계산
+        local_infected = sum(1 for person in local_people if person.infection_status == 1)
+        local_recovered = sum(1 for person in local_people if person.infection_status == 2)
+        local_dead = sum(1 for person in local_people if person.infection_status == 3)
+        
+        print(f"[DEBUG][Rank {rank}][Day {day}] Local counts: infected={local_infected}, recovered={local_recovered}, dead={local_dead}")
+        
+        # 집합 통신(reduce) 대신 점대점 통신을 사용하여 통계 수집
+        try:
+            if rank == 0:
+                # 랭크 0은 자신의 카운트로 초기화
+                total_infected = local_infected
+                total_recovered = local_recovered
+                total_dead = local_dead
+                
+                # 다른 모든 프로세스로부터 카운트 수집
+                for source_rank in range(1, size):
+                    print(f"[DEBUG][Rank 0][Day {day}] Waiting for statistics from rank {source_rank}")
+                    stats_from_rank = comm.recv(source=source_rank, tag=900+source_rank)
+                    print(f"[DEBUG][Rank 0][Day {day}] Received statistics from rank {source_rank}")
+                    
+                    # 받은 통계 합산
+                    total_infected += stats_from_rank[0]
+                    total_recovered += stats_from_rank[1]
+                    total_dead += stats_from_rank[2]
+            else:
+                # 다른 프로세스는 랭크 0에게 통계 전송
+                stats_package = [local_infected, local_recovered, local_dead]
+                print(f"[DEBUG][Rank {rank}][Day {day}] Sending statistics to rank 0")
+                comm.send(stats_package, dest=0, tag=900+rank)
+                
+                # 다른 랭크에서는 통계를 사용하지 않으므로 None으로 설정
+                total_infected = None
+                total_recovered = None
+                total_dead = None
+        except Exception as e:
+            print(f"[ERROR][Rank {rank}][Day {day}] Error during statistics collection: {str(e)}")
+        
+        # Save state and print statistics on rank 0
+        if rank == 0:
+            all_people = gather_all_people(local_people)
+            save_npy(map_array, all_people, houses_list, buildings_list, npy_save_dir)
+            
+            print(f"Day {day + 1} everyone has reached their home.")
+            print(f"Day {day + 1} simulation step completed.")
+            print(f"Day {day + 1} statistics:")
+            print(f"Infected: {total_infected}")
+            print(f"Recovered: {total_recovered}")
+            print(f"Dead: {total_dead}")
+            
+            # End timing for this day
+            elapsed_day = timing.end_timing(f"day_{day}")
+            print(f"[TIMING][Rank {rank}][Day {day}] Total day time: {elapsed_day:.4f} seconds")
+    
+    # Final statistics
+    if rank == 0:
+        all_people = gather_all_people(local_people)
+        
+        # Report final statistics
+        infected_count = sum(1 for person in all_people if person.infection_status == 1)
+        recovered_count = sum(1 for person in all_people if person.infection_status == 2)
+        dead_count = sum(1 for person in all_people if person.infection_status == 3)
+        
+        print(f"Final statistics after {num_days} days:")
+        print(f"Infected: {infected_count}")
+        print(f"Recovered: {recovered_count}")
+        print(f"Dead: {dead_count}")
+        
+        # End total timing and print summary
+        elapsed_total = timing.end_timing("total_simulation")
+        print(f"[TIMING][Rank {rank}] Total simulation time: {elapsed_total:.4f} seconds")
+        timing.print_all_timings()
+        
+        # Save timing results to file
+        if timing_output_file:
+            timing.save_timings()
+
 if __name__ == "__main__":
+    # Initialize MPI
+    try:
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+        size = comm.Get_size()
+        print(f"[INIT] Process {rank} of {size} started")
+    except Exception as e:
+        print(f"[CRITICAL ERROR] MPI initialization failed: {str(e)}")
+        import sys
+        sys.exit(1)
+    
     # Example usage
     map_size = 100
-    map_array, houses_list, buildings_list = generate_map(
-        size=map_size, 
-        houses=20, 
-        house_size=3, 
-        buildings=5, 
-        building_size=5,
-        roads=2,
-    )
     
-    # Generate people and place them in houses
-    people_list = generate_people(
-        map_array, 
-        houses_list, 
-        person_min_per_house=5, 
-        person_max_per_house=8, 
-        infection_rate=0.05,
-        mask_distribution=[0.5, 0.4, 0.1],  # 50% no mask, 40% cloth mask, 10% mask+face shield
-    )
+    # Only rank 0 generates the initial map and people
+    if rank == 0:
+        map_array, houses_list, buildings_list = generate_map(
+            size=map_size, 
+            houses=20, 
+            house_size=3, 
+            buildings=5, 
+            building_size=5,
+            roads=2,
+        )
+        
+        # Generate people and place them in houses
+        people_list = generate_people(
+            map_array, 
+            houses_list, 
+            person_min_per_house=5, 
+            person_max_per_house=8, 
+            infection_rate=0.05,
+            mask_distribution=[0.5, 0.4, 0.1],  # 50% no mask, 40% cloth mask, 10% mask+face shield
+        )
+        
+        print(f"Map size: {map_size}x{map_size}")
+        print(f"Houses: {len(houses_list)}")
+        print(f"Buildings: {len(buildings_list)}")
+        print(f"People: {len(people_list)}")
+        
+        # Print sample of people for debugging
+        print("\nSample of people:")
+        for i in range(min(5, len(people_list))):
+            print(people_list[i])
+    else:
+        # Other ranks initialize with empty values
+        map_array = None
+        houses_list = None
+        buildings_list = None
+        people_list = None
     
-    print(f"Map size: {map_size}x{map_size}")
-    print(f"Houses: {len(houses_list)}")
-    print(f"Buildings: {len(buildings_list)}")
-    print(f"People: {len(people_list)}")
+    # Broadcast map and objects to all processes
+    print(f"[DEBUG][Rank {rank}] Starting broadcast of data")
+    try:
+        print(f"[DEBUG][Rank {rank}] Broadcasting map_array")
+        map_array = comm.bcast(map_array, root=0)
+        print(f"[DEBUG][Rank {rank}] Broadcasting houses_list")
+        houses_list = comm.bcast(houses_list, root=0)
+        print(f"[DEBUG][Rank {rank}] Broadcasting buildings_list")
+        buildings_list = comm.bcast(buildings_list, root=0)
+        print(f"[DEBUG][Rank {rank}] Broadcasting people_list")
+        people_list = comm.bcast(people_list, root=0)
+        print(f"[DEBUG][Rank {rank}] All broadcasts complete")
+    except Exception as e:
+        print(f"[CRITICAL ERROR][Rank {rank}] Error during broadcast: {str(e)}")
+        import sys
+        sys.exit(1)
+    
+    # Create output directory for simulation data
+    timestamp = int(time.time())
+    save_dir = f'./simulation_data_{timestamp}/'
+    
+    # Create timing output directory
+    timing_dir = './timing_results'
+    if rank == 0 and not os.path.exists(timing_dir):
+        os.makedirs(timing_dir)
+    
+    # Run the parallel simulation
+    run_simulation_parallel(map_array, people_list, houses_list, buildings_list, 
+                          infection_rate=[0.003, 0.00001, 0.000001], 
+                          death_rate=[0.01, 0.005, 0.3], 
+                          num_days=5, 
+                          npy_save_dir=save_dir,
+                          timing_output_file=f"{timing_dir}/parallel_{timestamp}.json")
     
     # Visualize the initial map with people
     visualize_map(map_array, people_list)
@@ -942,7 +1529,14 @@ if __name__ == "__main__":
     for i in range(min(5, len(people_list))):
         print(people_list[i])
     
-    save_dir = f'./simulation_data_{int(time.time())}/'
+    timestamp = int(time.time())
+    save_dir = f'./simulation_data_{timestamp}/'
         
-    # Uncomment to run a full simulation
-    run_simulation(map_array, people_list, houses_list, buildings_list, infection_rate=[0.003, 0.00001, 0.000001], death_rate=[0.01, 0.005, 0.3], num_days=20, npy_save_dir=save_dir)
+    # Run a full simulation (sequential)
+    if rank == 0:  # Only rank 0 runs the sequential simulation
+        run_simulation(map_array, people_list, houses_list, buildings_list, 
+                      infection_rate=[0.003, 0.00001, 0.000001], 
+                      death_rate=[0.01, 0.005, 0.3], 
+                      num_days=5, 
+                      npy_save_dir=save_dir,
+                      timing_output_file=f"{timing_dir}/sequential_{timestamp}.json")

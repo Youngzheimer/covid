@@ -1,0 +1,362 @@
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_register: registering framework btl components
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_register: found loaded component self
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_register: component self register function successful
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_register: found loaded component ofi
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_register: registering framework btl components
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_register: found loaded component self
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_register: component ofi register function successful
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_register: found loaded component sm
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_register: component self register function successful
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_register: found loaded component ofi
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_register: registering framework btl components
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_register: found loaded component self
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_register: registering framework btl components
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_register: found loaded component self
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_register: component self register function successful
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_register: found loaded component ofi
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_register: component self register function successful
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_register: found loaded component ofi
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_register: component ofi register function successful
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_register: found loaded component sm
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_register: component sm register function successful
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_register: component ofi register function successful
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_register: found loaded component sm
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_register: component ofi register function successful
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_register: found loaded component sm
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_register: found loaded component tcp
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_register: component sm register function successful
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_register: found loaded component tcp
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_register: component tcp register function successful
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_open: opening btl components
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_open: found loaded component self
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_open: component self open function successful
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_open: found loaded component ofi
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_open: component ofi open function successful
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_open: found loaded component sm
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_open: component sm open function successful
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_open: found loaded component tcp
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_register: component sm register function successful
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_register: found loaded component tcp
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_register: component sm register function successful
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_register: found loaded component tcp
+[youngzheimers-MacBook-Air.local:80265] mca: base: components_open: component tcp open function successful
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_register: component tcp register function successful
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_open: opening btl components
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_open: found loaded component self
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_open: component self open function successful
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_open: found loaded component ofi
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_open: component ofi open function successful
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_open: found loaded component sm
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_open: component sm open function successful
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_open: found loaded component tcp
+[youngzheimers-MacBook-Air.local:80267] mca: base: components_open: component tcp open function successful
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_register: component tcp register function successful
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_open: opening btl components
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_open: found loaded component self
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_open: component self open function successful
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_open: found loaded component ofi
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_open: component ofi open function successful
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_open: found loaded component sm
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_open: component sm open function successful
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_open: found loaded component tcp
+[youngzheimers-MacBook-Air.local:80266] mca: base: components_open: component tcp open function successful
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_register: component tcp register function successful
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_open: opening btl components
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_open: found loaded component self
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_open: component self open function successful
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_open: found loaded component ofi
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_open: component ofi open function successful
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_open: found loaded component sm
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_open: component sm open function successful
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_open: found loaded component tcp
+[youngzheimers-MacBook-Air.local:80264] mca: base: components_open: component tcp open function successful
+[youngzheimers-MacBook-Air.local:80266] select: initializing btl component self
+[youngzheimers-MacBook-Air.local:80266] select: init of component self returned success
+[youngzheimers-MacBook-Air.local:80266] select: initializing btl component ofi
+[youngzheimers-MacBook-Air.local:80267] select: initializing btl component self
+[youngzheimers-MacBook-Air.local:80267] select: init of component self returned success
+[youngzheimers-MacBook-Air.local:80267] select: initializing btl component ofi
+[youngzheimers-MacBook-Air.local:80265] select: initializing btl component self
+[youngzheimers-MacBook-Air.local:80265] select: init of component self returned success
+[youngzheimers-MacBook-Air.local:80265] select: initializing btl component ofi
+[youngzheimers-MacBook-Air.local:80264] select: initializing btl component self
+[youngzheimers-MacBook-Air.local:80264] select: init of component self returned success
+[youngzheimers-MacBook-Air.local:80264] select: initializing btl component ofi
+[youngzheimers-MacBook-Air.local:80267] select: init of component ofi returned failure
+[youngzheimers-MacBook-Air.local:80264] select: init of component ofi returned failure
+[youngzheimers-MacBook-Air.local:80265] select: init of component ofi returned failure
+[youngzheimers-MacBook-Air.local:80266] select: init of component ofi returned failure
+[youngzheimers-MacBook-Air.local:80264] mca: base: close: component ofi closed
+[youngzheimers-MacBook-Air.local:80264] mca: base: close: unloading component ofi
+[youngzheimers-MacBook-Air.local:80264] select: initializing btl component sm
+[youngzheimers-MacBook-Air.local:80265] mca: base: close: component ofi closed
+[youngzheimers-MacBook-Air.local:80265] mca: base: close: unloading component ofi
+[youngzheimers-MacBook-Air.local:80265] select: initializing btl component sm
+[youngzheimers-MacBook-Air.local:80264] select: init of component sm returned success
+[youngzheimers-MacBook-Air.local:80264] select: initializing btl component tcp
+[youngzheimers-MacBook-Air.local:80265] select: init of component sm returned success
+[youngzheimers-MacBook-Air.local:80265] select: initializing btl component tcp
+[youngzheimers-MacBook-Air.local:80264] btl: tcp: Searching for exclude address+prefix: 127.0.0.1 / 8
+[youngzheimers-MacBook-Air.local:80264] btl: tcp: Found match: 127.0.0.1 (lo0)
+[youngzheimers-MacBook-Air.local:80264] btl: tcp: Using interface: sppp 
+[youngzheimers-MacBook-Air.local:80265] btl: tcp: Searching for exclude address+prefix: 127.0.0.1 / 8
+[youngzheimers-MacBook-Air.local:80265] btl: tcp: Found match: 127.0.0.1 (lo0)
+[youngzheimers-MacBook-Air.local:80265] btl: tcp: Using interface: sppp 
+[youngzheimers-MacBook-Air.local:80264] btl:tcp: 0x109606a20: if en0 kidx 2 cnt 0 addr 10.64.157.124 IPv4 bw 100 lt 100
+[youngzheimers-MacBook-Air.local:80265] btl:tcp: 0x105c04c80: if en0 kidx 2 cnt 0 addr 10.64.157.124 IPv4 bw 100 lt 100
+[youngzheimers-MacBook-Air.local:80265] btl:tcp: Attempting to bind to AF_INET port 1024
+[youngzheimers-MacBook-Air.local:80264] btl:tcp: Attempting to bind to AF_INET port 1024
+[youngzheimers-MacBook-Air.local:80265] btl:tcp: Successfully bound to AF_INET port 1024
+[youngzheimers-MacBook-Air.local:80264] btl:tcp: Attempting to bind to AF_INET port 1025
+[youngzheimers-MacBook-Air.local:80265] btl:tcp: my listening v4 socket is 0.0.0.0:1024
+[youngzheimers-MacBook-Air.local:80264] btl:tcp: Successfully bound to AF_INET port 1025
+[youngzheimers-MacBook-Air.local:80264] btl:tcp: my listening v4 socket is 0.0.0.0:1025
+[youngzheimers-MacBook-Air.local:80265] btl:tcp: Attempting to bind to AF_INET6 port 1024
+[youngzheimers-MacBook-Air.local:80265] btl:tcp: Attempting to bind to AF_INET6 port 1025
+[youngzheimers-MacBook-Air.local:80265] btl:tcp: Successfully bound to AF_INET6 port 1025
+[youngzheimers-MacBook-Air.local:80265] btl:tcp: my listening v6 socket port is 1025
+[youngzheimers-MacBook-Air.local:80265] btl: tcp: exchange: 0 2 IPv4 10.64.157.124
+[youngzheimers-MacBook-Air.local:80264] btl:tcp: Attempting to bind to AF_INET6 port 1024
+[youngzheimers-MacBook-Air.local:80264] btl:tcp: Attempting to bind to AF_INET6 port 1025
+[youngzheimers-MacBook-Air.local:80264] btl:tcp: Attempting to bind to AF_INET6 port 1026
+[youngzheimers-MacBook-Air.local:80264] btl:tcp: Successfully bound to AF_INET6 port 1026
+[youngzheimers-MacBook-Air.local:80264] btl:tcp: my listening v6 socket port is 1026
+[youngzheimers-MacBook-Air.local:80264] btl: tcp: exchange: 0 2 IPv4 10.64.157.124
+[youngzheimers-MacBook-Air.local:80265] select: init of component tcp returned success
+[youngzheimers-MacBook-Air.local:80264] select: init of component tcp returned success
+[youngzheimers-MacBook-Air.local:80266] mca: base: close: component ofi closed
+[youngzheimers-MacBook-Air.local:80266] mca: base: close: unloading component ofi
+[youngzheimers-MacBook-Air.local:80266] select: initializing btl component sm
+[youngzheimers-MacBook-Air.local:80267] mca: base: close: component ofi closed
+[youngzheimers-MacBook-Air.local:80267] mca: base: close: unloading component ofi
+[youngzheimers-MacBook-Air.local:80267] select: initializing btl component sm
+[youngzheimers-MacBook-Air.local:80266] select: init of component sm returned success
+[youngzheimers-MacBook-Air.local:80266] select: initializing btl component tcp
+[youngzheimers-MacBook-Air.local:80266] btl: tcp: Searching for exclude address+prefix: 127.0.0.1 / 8
+[youngzheimers-MacBook-Air.local:80266] btl: tcp: Found match: 127.0.0.1 (lo0)
+[youngzheimers-MacBook-Air.local:80266] btl: tcp: Using interface: sppp 
+[youngzheimers-MacBook-Air.local:80266] btl:tcp: 0x11d30a640: if en0 kidx 2 cnt 0 addr 10.64.157.124 IPv4 bw 100 lt 100
+[youngzheimers-MacBook-Air.local:80266] btl:tcp: Attempting to bind to AF_INET port 1024
+[youngzheimers-MacBook-Air.local:80266] btl:tcp: Attempting to bind to AF_INET port 1025
+[youngzheimers-MacBook-Air.local:80266] btl:tcp: Attempting to bind to AF_INET port 1026
+[youngzheimers-MacBook-Air.local:80266] btl:tcp: Successfully bound to AF_INET port 1026
+[youngzheimers-MacBook-Air.local:80266] btl:tcp: my listening v4 socket is 0.0.0.0:1026
+[youngzheimers-MacBook-Air.local:80266] btl:tcp: Attempting to bind to AF_INET6 port 1024
+[youngzheimers-MacBook-Air.local:80266] btl:tcp: Attempting to bind to AF_INET6 port 1025
+[youngzheimers-MacBook-Air.local:80266] btl:tcp: Attempting to bind to AF_INET6 port 1026
+[youngzheimers-MacBook-Air.local:80266] btl:tcp: Attempting to bind to AF_INET6 port 1027
+[youngzheimers-MacBook-Air.local:80266] btl:tcp: Successfully bound to AF_INET6 port 1027
+[youngzheimers-MacBook-Air.local:80266] btl:tcp: my listening v6 socket port is 1027
+[youngzheimers-MacBook-Air.local:80266] btl: tcp: exchange: 0 2 IPv4 10.64.157.124
+[youngzheimers-MacBook-Air.local:80267] select: init of component sm returned success
+[youngzheimers-MacBook-Air.local:80267] select: initializing btl component tcp
+[youngzheimers-MacBook-Air.local:80266] select: init of component tcp returned success
+[youngzheimers-MacBook-Air.local:80267] btl: tcp: Searching for exclude address+prefix: 127.0.0.1 / 8
+[youngzheimers-MacBook-Air.local:80267] btl: tcp: Found match: 127.0.0.1 (lo0)
+[youngzheimers-MacBook-Air.local:80267] btl: tcp: Using interface: sppp 
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: 0x10720ba00: if en0 kidx 2 cnt 0 addr 10.64.157.124 IPv4 bw 100 lt 100
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: Attempting to bind to AF_INET port 1024
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: Attempting to bind to AF_INET port 1025
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: Attempting to bind to AF_INET port 1026
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: Attempting to bind to AF_INET port 1027
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: Successfully bound to AF_INET port 1027
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: my listening v4 socket is 0.0.0.0:1027
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: Attempting to bind to AF_INET6 port 1024
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: Attempting to bind to AF_INET6 port 1025
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: Attempting to bind to AF_INET6 port 1026
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: Attempting to bind to AF_INET6 port 1027
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: Attempting to bind to AF_INET6 port 1028
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: Successfully bound to AF_INET6 port 1028
+[youngzheimers-MacBook-Air.local:80267] btl:tcp: my listening v6 socket port is 1028
+[youngzheimers-MacBook-Air.local:80267] btl: tcp: exchange: 0 2 IPv4 10.64.157.124
+[youngzheimers-MacBook-Air.local:80267] select: init of component tcp returned success
+[youngzheimers-MacBook-Air.local:80264] mca: bml: Using self btl for send to [[11941,1],0] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80267] mca: bml: Using self btl for send to [[11941,1],3] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80265] mca: bml: Using self btl for send to [[11941,1],1] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80266] mca: bml: Using self btl for send to [[11941,1],2] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80264] mca: bml: Using sm btl for send to [[11941,1],1] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80264] mca: bml: Using sm btl for send to [[11941,1],2] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80264] mca: bml: Using sm btl for send to [[11941,1],3] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80267] mca: bml: Using sm btl for send to [[11941,1],0] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80267] mca: bml: Using sm btl for send to [[11941,1],1] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80267] mca: bml: Using sm btl for send to [[11941,1],2] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80265] mca: bml: Using sm btl for send to [[11941,1],0] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80265] mca: bml: Using sm btl for send to [[11941,1],2] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80265] mca: bml: Using sm btl for send to [[11941,1],3] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80266] mca: bml: Using sm btl for send to [[11941,1],0] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80266] mca: bml: Using sm btl for send to [[11941,1],1] on node youngzheimers-MacBook-Air
+[youngzheimers-MacBook-Air.local:80266] mca: bml: Using sm btl for send to [[11941,1],3] on node youngzheimers-MacBook-Air
+[INIT] Process 2 of 4 started
+[DEBUG][Rank 2] Starting broadcast of data
+[DEBUG][Rank 2] Broadcasting map_array
+[INIT] Process 1 of 4 started
+[DEBUG][Rank 1] Starting broadcast of data
+[DEBUG][Rank 1] Broadcasting map_array
+[INIT] Process 3 of 4 started
+[DEBUG][Rank 3] Starting broadcast of data
+[DEBUG][Rank 3] Broadcasting map_array
+[INIT] Process 0 of 4 started
+Map size: 100x100
+Houses: 20
+Buildings: 5
+People: 131
+
+Sample of people:
+Person 1 at (7,74), House: 0, Age: adult, Mask: no mask, Status: normal
+Person 2 at (8,72), House: 0, Age: senior, Mask: no mask, Status: normal
+Person 3 at (9,73), House: 0, Age: adult, Mask: no mask, Status: normal
+Person 4 at (8,74), House: 0, Age: child, Mask: mask, Status: normal
+Person 5 at (9,72), House: 0, Age: adult, Mask: mask, Status: normal
+[DEBUG][Rank 0] Starting broadcast of data
+[DEBUG][Rank 0] Broadcasting map_array
+[DEBUG][Rank 2] Broadcasting houses_list
+[DEBUG][Rank 1] Broadcasting houses_list
+[DEBUG][Rank 0] Broadcasting houses_list
+[DEBUG][Rank 3] Broadcasting houses_list
+[DEBUG][Rank 0] Broadcasting buildings_list
+[DEBUG][Rank 2] Broadcasting buildings_list
+[DEBUG][Rank 2] Broadcasting people_list
+[DEBUG][Rank 0] Broadcasting people_list
+[DEBUG][Rank 3] Broadcasting buildings_list
+[DEBUG][Rank 1] Broadcasting buildings_list
+[DEBUG][Rank 1] Broadcasting people_list
+[DEBUG][Rank 3] Broadcasting people_list
+[DEBUG][Rank 1] All broadcasts complete
+[DEBUG][Rank 1] Starting parallel simulation, rank 1 of 4
+[DEBUG][Rank 1] Splitting people by regions
+[DEBUG][Rank 1] Region: rows 25-50, Got 22 people out of 131
+[DEBUG][Rank 1] Waiting at barrier before simulation loop
+[DEBUG][Rank 0] All broadcasts complete
+[DEBUG][Rank 0] Starting parallel simulation, rank 0 of 4
+[DEBUG][Rank 3] All broadcasts complete
+[DEBUG][Rank 3] Starting parallel simulation, rank 3 of 4
+[DEBUG][Rank 3] Splitting people by regions
+[DEBUG][Rank 3] Region: rows 75-100, Got 62 people out of 131
+[DEBUG][Rank 3] Waiting at barrier before simulation loop
+[DEBUG][Rank 2] All broadcasts complete
+[DEBUG][Rank 2] Starting parallel simulation, rank 2 of 4
+[DEBUG][Rank 2] Splitting people by regions
+[DEBUG][Rank 2] Region: rows 50-75, Got 0 people out of 131
+[DEBUG][Rank 2] Waiting at barrier before simulation loop
+Starting parallel simulation with 131 people on 4 processes...
+Initial infected count: 9
+[DEBUG][Rank 0] Splitting people by regions
+[DEBUG][Rank 0] Region: rows 0-25, Got 47 people out of 131
+[DEBUG][Rank 0] Waiting at barrier before simulation loop
+[DEBUG][Rank 0] Barrier passed, starting simulation loop
+[DEBUG][Rank 2] Barrier passed, starting simulation loop
+[DEBUG][Rank 2][Day 0] Starting movement cycle
+[DEBUG][Rank 2][Day 0] Simulating movement for 0 people
+[DEBUG][Rank 2][Day 0] Movement simulation complete
+[DEBUG][Rank 2][Day 0] Starting boundary exchange
+[DEBUG][Rank 2] Exchange: 0 people leaving, 0 staying
+[DEBUG][Rank 2] Exchanging data with rank 0
+[DEBUG][Rank 0][Day 0] Starting movement cycle
+[DEBUG][Rank 0][Day 0] Simulating movement for 47 people
+[DEBUG][Rank 1] Barrier passed, starting simulation loop
+[DEBUG][Rank 1][Day 0] Starting movement cycle
+[DEBUG][Rank 1][Day 0] Simulating movement for 22 people
+[DEBUG][Rank 3] Barrier passed, starting simulation loop
+[DEBUG][Rank 3][Day 0] Starting movement cycle
+[DEBUG][Rank 3][Day 0] Simulating movement for 62 people
+[DEBUG][Rank 1][Day 0] Movement simulation complete
+[DEBUG][Rank 1][Day 0] Starting boundary exchange
+[DEBUG][Rank 1] Exchange: 9 people leaving, 13 staying
+[DEBUG][Rank 1] Sending 9 people to rank 0
+[DEBUG][Rank 1] Person 88 at (23,85) moving to rank 0
+[DEBUG][Rank 1] Person 90 at (23,85) moving to rank 0
+[DEBUG][Rank 1] Person 93 at (23,85) moving to rank 0
+[DEBUG][Rank 1] Person 110 at (23,20) moving to rank 0
+[DEBUG][Rank 1] Person 112 at (23,21) moving to rank 0
+[DEBUG][Rank 1] Person 113 at (23,75) moving to rank 0
+[DEBUG][Rank 1] Person 114 at (23,76) moving to rank 0
+[DEBUG][Rank 1] Person 115 at (23,74) moving to rank 0
+[DEBUG][Rank 1] Person 118 at (23,76) moving to rank 0
+[DEBUG][Rank 1] Exchanging data with rank 0
+[DEBUG][Rank 0][Day 0] Movement simulation complete
+[DEBUG][Rank 0][Day 0] Starting boundary exchange
+[DEBUG][Rank 0] Exchange: 0 people leaving, 47 staying
+[DEBUG][Rank 0] Exchanging data with rank 1
+[DEBUG][Rank 1] Received 0 people from rank 0
+[DEBUG][Rank 1] Exchanging data with rank 2
+[DEBUG][Rank 0] Received 9 people from rank 1
+[DEBUG][Rank 0] Exchanging data with rank 2
+[DEBUG][Rank 3][Day 0] Movement simulation complete
+[DEBUG][Rank 3][Day 0] Starting boundary exchange
+[DEBUG][Rank 3] Exchange: 0 people leaving, 62 staying
+[DEBUG][Rank 3] Exchanging data with rank 0
+[DEBUG][Rank 2] Received 0 people from rank 0
+[DEBUG][Rank 2] Exchanging data with rank 1
+[DEBUG][Rank 2] Received 0 people from rank 1
+[DEBUG][Rank 2] Exchanging data with rank 3
+[DEBUG][Rank 0] Received 0 people from rank 2
+[DEBUG][Rank 0] Exchanging data with rank 3
+[DEBUG][Rank 1] Received 0 people from rank 2
+[DEBUG][Rank 1] Exchanging data with rank 3
+[DEBUG][Rank 1] Received 0 people from rank 3
+[DEBUG][Rank 3] Received 0 people from rank 0
+[DEBUG][Rank 3] Exchanging data with rank 1
+[DEBUG][Rank 3] Received 0 people from rank 1
+[DEBUG][Rank 3] Exchanging data with rank 2
+[DEBUG][Rank 3] Received 0 people from rank 2
+[DEBUG][Rank 2] Received 0 people from rank 3
+[DEBUG][Rank 0] Received 0 people from rank 3
+[DEBUG][Rank 0] Exchange completed: now has 56 people
+[DEBUG][Rank 0][Day 0] Boundary exchange complete
+[DEBUG][Rank 0][Day 0] Simulating infections
+[DEBUG][Rank 3] Exchange completed: now has 62 people
+[DEBUG][Rank 3][Day 0] Boundary exchange complete
+[DEBUG][Rank 3][Day 0] Simulating infections
+[DEBUG][Rank 1] Exchange completed: now has 13 people
+[DEBUG][Rank 1][Day 0] Boundary exchange complete
+[DEBUG][Rank 1][Day 0] Simulating infections
+[DEBUG][Rank 1][Day 0] Infection simulation complete
+[DEBUG][Rank 1][Day 0] Checking if all people have arrived
+[DEBUG][Rank 2] Exchange completed: now has 0 people
+[DEBUG][Rank 2][Day 0] Boundary exchange complete
+[DEBUG][Rank 1][Day 0] Local arrival status: False
+[DEBUG][Rank 1][Day 0] Checking global arrival status using point-to-point
+[DEBUG][Rank 1][Day 0] Sending arrival status False to rank 0
+[DEBUG][Rank 2][Day 0] Simulating infections
+[DEBUG][Rank 2][Day 0] Infection simulation complete
+[DEBUG][Rank 2][Day 0] Checking if all people have arrived
+[DEBUG][Rank 2][Day 0] Local arrival status: True
+[DEBUG][Rank 2][Day 0] Checking global arrival status using point-to-point
+[DEBUG][Rank 2][Day 0] Sending arrival status True to rank 0
+[DEBUG][Rank 0][Day 0] Infection simulation complete
+[DEBUG][Rank 0][Day 0] Checking if all people have arrived
+[DEBUG][Rank 0][Day 0] Local arrival status: False
+[DEBUG][Rank 0][Day 0] Checking global arrival status using point-to-point
+[DEBUG][Rank 0][Day 0] Waiting for arrival status from rank 1
+[DEBUG][Rank 0][Day 0] Received arrival status False from rank 1
+[DEBUG][Rank 0][Day 0] Waiting for arrival status from rank 2
+[DEBUG][Rank 0][Day 0] Received arrival status True from rank 2
+[DEBUG][Rank 0][Day 0] Waiting for arrival status from rank 3
+[DEBUG][Rank 3][Day 0] Infection simulation complete
+[DEBUG][Rank 3][Day 0] Checking if all people have arrived
+[DEBUG][Rank 3][Day 0] Local arrival status: False
+[DEBUG][Rank 3][Day 0] Checking global arrival status using point-to-point
+[DEBUG][Rank 3][Day 0] Sending arrival status False to rank 0
+[DEBUG][Rank 0][Day 0] Received arrival status False from rank 3
+[DEBUG][Rank 0][Day 0] Global arrival status: False
+[DEBUG][Rank 0][Day 0] Gathering people data for saving
+[DEBUG][Rank 0] Starting gather with 56 local people
+[DEBUG][Rank 0] Waiting to receive data from rank 1
+[DEBUG][Rank 3][Day 0] Global arrival status received from rank 0: False
+[DEBUG][Rank 3][Day 0] Simulating movement for 62 people
+[DEBUG][Rank 1][Day 0] Global arrival status received from rank 0: False
+[DEBUG][Rank 1][Day 0] Simulating movement for 13 people
+[DEBUG][Rank 2][Day 0] Global arrival status received from rank 0: False
+[DEBUG][Rank 2][Day 0] Simulating movement for 0 people
+[DEBUG][Rank 2][Day 0] Movement simulation complete
+[DEBUG][Rank 2][Day 0] Starting boundary exchange
+[DEBUG][Rank 2] Exchange: 0 people leaving, 0 staying
+[DEBUG][Rank 2] Exchanging data with rank 0
+[DEBUG][Rank 1][Day 0] Movement simulation complete
+[DEBUG][Rank 1][Day 0] Starting boundary exchange
+[DEBUG][Rank 1] Exchange: 0 people leaving, 13 staying
+[DEBUG][Rank 1] Exchanging data with rank 0
+[DEBUG][Rank 3][Day 0] Movement simulation complete
+[DEBUG][Rank 3][Day 0] Starting boundary exchange
+[DEBUG][Rank 3] Exchange: 0 people leaving, 62 staying
+[DEBUG][Rank 3] Exchanging data with rank 0
