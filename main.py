@@ -273,12 +273,35 @@ def run_simulation(map_array, people_list, houses_list, buildings_list, num_days
         while True:
             # Simulate movement of people
             simulate_movement(people_list, map_array, houses_list, buildings_list)
+            # Simulate infection spread
             visualize_map(map_array, people_list)
             
             # Check if all people have reached their destinations
             if all(person.dest_type is None for person in people_list):
                 break
+        
+        print(f"Day {day + 1} everyone has reached their work or school or sum idk.")
 
+        # Simulate infection spread inside houses and buildings
+
+
+        # And go home yeyeyeyeyeyeyeyeyeyeyeyeyey   
+        for person in people_list:
+            person.dest_type = 'house'
+            person.dest_id = person.house_id  # Go back to their house
+
+        while True:
+            # Simulate movement of people
+            simulate_movement(people_list, map_array, houses_list, buildings_list)
+            # Simulate infection spread
+            visualize_map(map_array, people_list)
+
+            # Check if all people have reached their destinations
+            if all(person.dest_type is None for person in people_list):
+                break
+        
+        print(f"Day {day + 1} everyone has reached their home.")
+        print(f"Day {day + 1} simulation step completed.")
 
     # Visualize final state
     visualize_map(map_array, people_list)
@@ -293,9 +316,108 @@ def run_simulation(map_array, people_list, houses_list, buildings_list, num_days
     print(f"Recovered: {recovered_count}")
     print(f"Dead: {dead_count}")
 
+def find_path(map_array, start_x, start_y, target_x, target_y):
+    """
+    Find the shortest path on roads from start to target using BFS.
+    
+    Parameters:
+    - map_array: The map grid
+    - start_x, start_y: Starting position
+    - target_x, target_y: Target position
+    
+    Returns:
+    - A list of (x, y) coordinates representing the path from start to target,
+      or None if no path is found
+    """
+    # Check if start or target is not a road
+    if start_x < 0 or start_y < 0 or start_x >= map_array.shape[0] or start_y >= map_array.shape[1]:
+        return None
+        
+    # Directions: up, right, down, left
+    directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+    
+    # Queue for BFS
+    queue = [(start_x, start_y)]
+    # Visited set to avoid cycles
+    visited = set([(start_x, start_y)])
+    # Parent dictionary to reconstruct the path
+    parent = {}
+    
+    while queue:
+        x, y = queue.pop(0)
+        
+        # Check if we've reached the target
+        if x == target_x and y == target_y:
+            # Reconstruct path
+            path = []
+            current = (x, y)
+            while current != (start_x, start_y):
+                path.append(current)
+                current = parent[current]
+            path.append((start_x, start_y))
+            # Return path in correct order (start to target)
+            return path[::-1]
+        
+        # Try all four directions
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            
+            # Check if within bounds
+            if 0 <= nx < map_array.shape[0] and 0 <= ny < map_array.shape[1]:
+                # Check if it's a road and not visited
+                if map_array[nx, ny] == 1 and (nx, ny) not in visited:
+                    queue.append((nx, ny))
+                    visited.add((nx, ny))
+                    parent[(nx, ny)] = (x, y)
+    
+    # No path found
+    return None
+
+def find_nearest_road(map_array, target_x, target_y):
+    """
+    Find the nearest road to a target point.
+    
+    Parameters:
+    - map_array: The map grid
+    - target_x, target_y: Target position
+    
+    Returns:
+    - (x, y) of the nearest road point, or None if not found
+    """
+    # Check if target is already a road
+    if (0 <= target_x < map_array.shape[0] and 0 <= target_y < map_array.shape[1] and 
+        map_array[target_x, target_y] == 1):
+        return (target_x, target_y)
+    
+    # BFS to find nearest road
+    directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+    queue = [(target_x, target_y, 0)]  # (x, y, distance)
+    visited = set([(target_x, target_y)])
+    
+    while queue:
+        x, y, dist = queue.pop(0)
+        
+        # Check all four directions
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            
+            # Check if within bounds
+            if 0 <= nx < map_array.shape[0] and 0 <= ny < map_array.shape[1]:
+                # Check if it's a road
+                if map_array[nx, ny] == 1:
+                    return (nx, ny)
+                
+                # Add to queue if not visited
+                if (nx, ny) not in visited:
+                    queue.append((nx, ny, dist + 1))
+                    visited.add((nx, ny))
+    
+    # No road found
+    return None
+
 def simulate_movement(people_list, map_array, houses_list, buildings_list):
     """
-    Simulate movement of people on the map.
+    Simulate movement of people on the map using pathfinding.
     
     Parameters:
     - people_list: List of Person objects
@@ -308,6 +430,7 @@ def simulate_movement(people_list, map_array, houses_list, buildings_list):
         if person.dest_type is None or person.dest_id is None:
             # Person has no destination, they might be inside their house or building
             continue
+            
         # check if the person is at their destination
         # find the house x y range with the destination ID
         if person.dest_type == 'house':
@@ -330,8 +453,7 @@ def simulate_movement(people_list, map_array, houses_list, buildings_list):
         # check if the person is inside a house or building (that is not their destination)
         if map_array[person.x, person.y] in range(200, 400):
             # Person is inside a house that is not their destination
-            # go touch some grass bruh
-            # 지가 있는 건물 앞쪽의 도로로 나가기 (앞에 사람 있으면 기달)
+            # Find an exit to a road
             
             # 건물의 종류 확인 (집인지 빌딩인지)
             building_id = map_array[person.x, person.y] - 200 if map_array[person.x, person.y] < 300 else map_array[person.x, person.y] - 300
@@ -355,116 +477,91 @@ def simulate_movement(people_list, map_array, houses_list, buildings_list):
                 for x in range(min_x, max_x + 1):
                     # 위쪽에 도로가 있는지 확인
                     if min_y > 0 and map_array[x, min_y - 1] == 1:
-                        # 해당 위치에 사람이 있는지 확인
-                        is_occupied = any(p.x == x and p.y == min_y - 1 for p in people_list if p != person)
-                        if not is_occupied:
-                            possible_exits.append((x, min_y - 1))
+                        possible_exits.append((x, min_y - 1))
                 
                 # 아래쪽 가장자리
                 for x in range(min_x, max_x + 1):
                     # 아래쪽에 도로가 있는지 확인
                     if max_y < map_array.shape[0] - 1 and map_array[x, max_y + 1] == 1:
-                        # 해당 위치에 사람이 있는지 확인
-                        is_occupied = any(p.x == x and p.y == max_y + 1 for p in people_list if p != person)
-                        if not is_occupied:
-                            possible_exits.append((x, max_y + 1))
+                        possible_exits.append((x, max_y + 1))
                 
                 # 왼쪽 가장자리
                 for y in range(min_y, max_y + 1):
                     # 왼쪽에 도로가 있는지 확인
                     if min_x > 0 and map_array[min_x - 1, y] == 1:
-                        # 해당 위치에 사람이 있는지 확인
-                        is_occupied = any(p.x == min_x - 1 and p.y == y for p in people_list if p != person)
-                        if not is_occupied:
-                            possible_exits.append((min_x - 1, y))
+                        possible_exits.append((min_x - 1, y))
                 
                 # 오른쪽 가장자리
                 for y in range(min_y, max_y + 1):
                     # 오른쪽에 도로가 있는지 확인
                     if max_x < map_array.shape[1] - 1 and map_array[max_x + 1, y] == 1:
-                        # 해당 위치에 사람이 있는지 확인
-                        is_occupied = any(p.x == max_x + 1 and p.y == y for p in people_list if p != person)
-                        if not is_occupied:
-                            possible_exits.append((max_x + 1, y))
-                
+                        possible_exits.append((max_x + 1, y))
+
                 # 가능한 출구가 있으면 하나 선택해서 이동
                 if possible_exits:
                     exit_x, exit_y = random.choice(possible_exits)
                     person.x, person.y = exit_x, exit_y
             continue
 
-        # Move towards the destination
-        # 목표 지점 x, y 확인 후, 도로를 따라서 건물으로 이동. 사람이 있으면 기다리기
+        # Find target position
+        target = None
         if person.dest_type == 'house':
             target = next((house for house in houses_list if house.id == person.dest_id), None)
-            if target:
-                target_x, target_y = target.x + target.size // 2, target.y + target.size // 2
         elif person.dest_type == 'building':
             target = next((building for building in buildings_list if building.id == person.dest_id), None)
-            if target:
-                target_x, target_y = target.x + target.size // 2, target.y + target.size // 2
         else:
             continue  # No valid destination
-
+            
+        if not target:
+            continue
+            
+        # Get center of target for pathfinding reference
+        target_center_x, target_center_y = target.x + target.size // 2, target.y + target.size // 2
+        
+        # Find a road point near the target if target is not on a road
+        nearest_road = find_nearest_road(map_array, target_center_x, target_center_y)
+        if not nearest_road:
+            continue
+        
+        target_road_x, target_road_y = nearest_road
+        
         # Check if we're on a road
         if map_array[person.x, person.y] != 1:
             # Not on a road - shouldn't happen, but just in case
             continue
 
-        # Possible movement directions (up, right, down, left)
+        # Check if we're adjacent to the target
         directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
-        best_move = None
-        min_distance = float('inf')
-
-        # First check if we're adjacent to our destination building/house
         is_adjacent_to_dest = False
-        if target:
-            # Check all adjacent cells to see if any is part of the destination
-            for dx, dy in directions:
-                nx, ny = person.x + dx, person.y + dy
-                
-                # Check if this adjacent cell is within map boundaries and is part of our destination
-                if (0 <= nx < map_array.shape[0] and 0 <= ny < map_array.shape[1] and 
-                    target.contains_point(nx, ny)):
-                    is_adjacent_to_dest = True
-                    break
         
-        # If we're adjacent to our destination, enter at a random position
-        if is_adjacent_to_dest:
-            # Select random position inside the building/house
-            if target:
-                valid_positions = []
-                for x in range(target.x, target.x + target.size):
-                    for y in range(target.y, target.y + target.size):
-                        # Make sure no other person is at this position
-                        is_occupied = any(p.x == x and p.y == y for p in people_list if p != person)
-                        if not is_occupied:
-                            valid_positions.append((x, y))
-                
-                if valid_positions:
-                    # Choose a random valid position inside the building
-                    best_move = random.choice(valid_positions)
-                    person.x, person.y = best_move
-                    continue
-        
-        # If not adjacent to destination or no valid position inside, find the best move on roads
         for dx, dy in directions:
             nx, ny = person.x + dx, person.y + dy
+            if (0 <= nx < map_array.shape[0] and 0 <= ny < map_array.shape[1] and 
+                target.contains_point(nx, ny)):
+                is_adjacent_to_dest = True
+                break
+                
+        # If we're adjacent to the target, enter it
+        if is_adjacent_to_dest:
+            valid_positions = []
+            for x in range(target.x, target.x + target.size):
+                for y in range(target.y, target.y + target.size):
+                    valid_positions.append((x, y))
             
-            # Check boundaries
-            if 0 <= nx < map_array.shape[0] and 0 <= ny < map_array.shape[1]:
-                # Check if it's a road and not occupied by another person
-                is_occupied = any(p.x == nx and p.y == ny for p in people_list if p != person)
-                if map_array[nx, ny] == 1 and not is_occupied:
-                    # Calculate Manhattan distance to target
-                    dist = abs(nx - target_x) + abs(ny - target_y)
-                    if dist < min_distance:
-                        min_distance = dist
-                        best_move = (nx, ny)
-
-        # Make the move if we found a valid one
-        if best_move:
-            person.x, person.y = best_move
+            if valid_positions:
+                # Choose a random valid position inside the building
+                best_move = random.choice(valid_positions)
+                person.x, person.y = best_move
+                continue
+        
+        # Find the shortest path on roads to the target
+        path = find_path(map_array, person.x, person.y, target_road_x, target_road_y)
+        
+        # If path found, move along the path (one step at a time)
+        if path and len(path) > 1:  # Need at least current position and next position
+            # The next position in the path is at index 1 (index 0 is current position)
+            next_x, next_y = path[1]
+            person.x, person.y = next_x, next_y
 
         
 if __name__ == "__main__":
