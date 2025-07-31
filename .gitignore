@@ -4,3 +4,5 @@ temp*
 *.mp4
 videos
 .DS_Store
+__pycache__
+timing_results

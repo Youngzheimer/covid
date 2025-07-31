@@ -1,8 +1,35 @@
+# 원본 코드와 비교한 주요 변경사항:
+
+# 1. 객체 지향적 설계
+#    - Person, House, Building 클래스 추가
+#    - 각 개체를 객체로 모델링하여 관리
+
+# 2. 더 복잡한 모델링 기능
+#    - 지도 생성 함수 (generate_map)
+#    - 사람 생성 함수 (generate_people)
+#    - 경로 찾기 알고리즘 (find_path, find_nearest_road)
+
+# 3. 감염 모델의 세분화
+#    - 마스크 착용 상태에 따른 감염률 차별화
+#    - 연령에 따른 회복률과 사망률 차별화
+#    - 실내와 실외의 감염 확산 모델 분리
+
+# 4. 병렬 처리 기능
+#    - MPI를 활용한 영역 분할 병렬 처리
+#    - 프로세스 간 사람 데이터 교환 기능
+#    - 분산된 데이터 수집 기능
+
+# 5. 시뮬레이션 흐름 구조화
+#    - 하루 단위의 시뮬레이션 사이클
+#    - 출근-업무-귀가 패턴 구현
+#    - 일과 중 감염 시뮬레이션과 집에서의 감염 시뮬레이션 분리
+
 import numpy as np
 import matplotlib.pyplot as plt
 import random
 import os
 import time
+import sys
 from mpi4py import MPI
 from timing_results import TimingManager
 
@@ -832,7 +859,6 @@ def simulate_infection(people_list, infection_rate, recovery_rate, death_rate):
             if random.random() < infection_probability:
                 person.infection_status = 1  # Set to infected
 
-
 def simulate_infection_inside(people_list, houses_list, buildings_list, infection_rate, recovery_rate, death_rate, simulation_iterations=1):
     """
     Simulate infection spread inside houses and buildings.
@@ -937,7 +963,6 @@ def simulate_infection_inside(people_list, houses_list, buildings_list, infectio
         if random.random() < recovery_rate[person.age_group]:
             person.infection_status = 2  # Recovered
 
-        
 def split_people_by_regions(people_list, map_size, num_processes):
     """
     Split people into regions for parallel processing.
@@ -1468,7 +1493,7 @@ if __name__ == "__main__":
             person_min_per_house=5, 
             person_max_per_house=8, 
             infection_rate=0.05,
-            mask_distribution=[0.5, 0.4, 0.1],  # 50% no mask, 40% cloth mask, 10% mask+face shield
+            mask_distribution=[0.3, 0.6, 0.1],  # 30% no mask, 60% cloth mask, 10% mask+face shield
         )
         
         print(f"Map size: {map_size}x{map_size}")
@@ -1517,9 +1542,10 @@ if __name__ == "__main__":
     run_simulation_parallel(map_array, people_list, houses_list, buildings_list, 
                           infection_rate=[0.003, 0.00001, 0.000001], 
                           death_rate=[0.01, 0.005, 0.3], 
-                          num_days=5, 
+                          num_days=50, 
                           npy_save_dir=save_dir,
-                          timing_output_file=f"{timing_dir}/parallel_{timestamp}.json")
+                          timing_output_file=f"{timing_dir}/parallel_{timestamp}.json",
+                          infected_people_conscience=0)
     
     # Visualize the initial map with people
     visualize_map(map_array, people_list)
@@ -1533,10 +1559,10 @@ if __name__ == "__main__":
     save_dir = f'./simulation_data_{timestamp}/'
         
     # Run a full simulation (sequential)
-    if rank == 0:  # Only rank 0 runs the sequential simulation
-        run_simulation(map_array, people_list, houses_list, buildings_list, 
-                      infection_rate=[0.003, 0.00001, 0.000001], 
-                      death_rate=[0.01, 0.005, 0.3], 
-                      num_days=5, 
-                      npy_save_dir=save_dir,
-                      timing_output_file=f"{timing_dir}/sequential_{timestamp}.json")
+    # if rank == 0:  # Only rank 0 runs the sequential simulation
+    #     run_simulation(map_array, people_list, houses_list, buildings_list, 
+    #                   infection_rate=[0.003, 0.00001, 0.000001], 
+    #                   death_rate=[0.01, 0.005, 0.3], 
+    #                   num_days=5, 
+    #                   npy_save_dir=save_dir,
+    #                   timing_output_file=f"{timing_dir}/sequential_{timestamp}.json")
