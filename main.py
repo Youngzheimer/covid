@@ -1,3 +1,5 @@
+# __main__ 블록에 있는 run_simulation_parallel, run_simulation 으로 각 병렬과 직렬 테스트 가능
+
 # 원본 코드와 비교한 주요 변경사항:
 
 # 1. 객체 지향적 설계
